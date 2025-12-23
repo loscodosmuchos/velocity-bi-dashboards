@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Truck Dashboard - Velocity BI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'JetBrains Mono', monospace;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('/dashboards/future_truck_dashboard.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .data-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .data-value {
+            position: absolute;
+            font-weight: 700;
+            text-shadow: 0 0 15px currentColor, 0 0 30px currentColor, 0 0 45px currentColor;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+        }
+
+        /* Hexagonal layout positioning */
+        .hex-tl {
+            top: 22%;
+            left: 22%;
+            font-size: 4.5rem;
+            color: #38BDF8;
+        }
+
+        .hex-tr {
+            top: 22%;
+            left: 78%;
+            font-size: 4.5rem;
+            color: #38BDF8;
+        }
+
+        .hex-bl {
+            top: 68%;
+            left: 22%;
+            font-size: 4.5rem;
+            color: #38BDF8;
+        }
+
+        .hex-br {
+            top: 68%;
+            left: 78%;
+            font-size: 4.5rem;
+            color: #F59E0B;
+        }
+
+        /* Data stream ticker at bottom */
+        .data-stream {
+            bottom: 5%;
+            left: 5%;
+            right: 5%;
+            font-size: 1rem;
+            color: #38BDF8;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .data-stream-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll-left 30s linear infinite;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 10px;
+            height: 10px;
+            background: #38BDF8;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .data-value.updating {
+            animation: glitch 0.5s ease;
+        }
+
+        @keyframes glitch {
+            0% { opacity: 1; transform: translate(0); }
+            20% { opacity: 0.8; transform: translate(-2px, 2px); }
+            40% { opacity: 0.6; transform: translate(2px, -2px); }
+            60% { opacity: 0.8; transform: translate(-1px, 1px); }
+            80% { opacity: 0.9; transform: translate(1px, -1px); }
+            100% { opacity: 1; transform: translate(0); }
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 0.75rem 1.5rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38BDF8;
+            text-decoration: none;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        }
+
+        .alert-indicator {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <a href="/" class="back-button">← Back to Dashboard Selector</a>
+        
+        <div class="data-overlay">
+            <div class="data-value hex-tl" id="aiAccuracy">98.7%</div>
+            <div class="data-value hex-tr" id="autonomousSourcing">156</div>
+            <div class="data-value hex-bl" id="supplyChainResilience">92%</div>
+            <div class="data-value hex-br alert-indicator" id="riskDetection">3</div>
+            
+            <div class="data-stream">
+                <div class="data-stream-content" id="dataStream">
+                    REAL-TIME DATA STREAM: Global component demand spike... Energy cost fluctuation... Delivery delay risk... Smart contract execution... Supplier credit rating change... Geopolitical risk assessment... Weather impact analysis... Blockchain verification complete...
+                </div>
+            </div>
+            
+            <div class="loading-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        const UPDATE_INTERVAL = 30000; // 30 seconds
+
+        const dataElements = {
+            aiAccuracy: document.getElementById('aiAccuracy'),
+            autonomousSourcing: document.getElementById('autonomousSourcing'),
+            supplyChainResilience: document.getElementById('supplyChainResilience'),
+            riskDetection: document.getElementById('riskDetection'),
+            dataStream: document.getElementById('dataStream')
+        };
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/future-truck/metrics`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        function updateDashboard(data) {
+            if (!data) return;
+            
+            updateValue(dataElements.aiAccuracy, `${data.aiPredictionAccuracy}%`);
+            updateValue(dataElements.autonomousSourcing, data.autonomousSourcing);
+            updateValue(dataElements.supplyChainResilience, `${data.supplyChainResilience}%`);
+            updateValue(dataElements.riskDetection, data.riskDetection);
+            
+            if (data.dataStream) {
+                dataElements.dataStream.textContent = `REAL-TIME DATA STREAM: ${data.dataStream}`;
+            }
+        }
+
+        function updateValue(element, newValue) {
+            if (element.textContent !== String(newValue)) {
+                element.classList.add('updating');
+                element.textContent = newValue;
+                setTimeout(() => element.classList.remove('updating'), 500);
+            }
+        }
+
+        async function init() {
+            const data = await fetchDashboardData();
+            updateDashboard(data);
+            
+            setInterval(async () => {
+                const data = await fetchDashboardData();
+                updateDashboard(data);
+            }, UPDATE_INTERVAL);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Car Dashboard - Velocity BI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #F5F5F5;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('/dashboards/electric_car_dashboard.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .data-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .data-value {
+            position: absolute;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Gauge positioning for electric car - clean minimalist layout */
+        .energy-efficiency {
+            top: 45%;
+            left: 20%;
+            font-size: 5.5rem;
+            color: #10B981;
+            font-weight: 200;
+        }
+
+        .sustainability-score {
+            top: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 6rem;
+            color: #10B981;
+            font-weight: 200;
+        }
+
+        .cost-savings {
+            top: 45%;
+            right: 20%;
+            font-size: 5.5rem;
+            color: #10B981;
+            font-weight: 200;
+        }
+
+        /* Bottom metrics bar */
+        .metrics-bar {
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: #6B7280;
+            text-align: center;
+            width: 80%;
+            font-weight: 300;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .data-value.updating {
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-5px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 0.75rem 1.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            text-decoration: none;
+            border-radius: 0.75rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            pointer-events: all;
+            z-index: 10;
+            font-weight: 400;
+        }
+
+        .back-button:hover {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <a href="/" class="back-button">← Back to Dashboard Selector</a>
+        
+        <div class="data-overlay">
+            <div class="data-value energy-efficiency" id="energyEfficiency">92%</div>
+            <div class="data-value sustainability-score" id="sustainabilityScore">A+</div>
+            <div class="data-value cost-savings" id="costSavings">$1.2M</div>
+            
+            <div class="data-value metrics-bar" id="metricsBar">
+                CARBON OFFSET 450T | RENEWABLE ENERGY 87% | VENDOR ECO-SCORE 9.1/10
+            </div>
+            
+            <div class="loading-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        const UPDATE_INTERVAL = 30000; // 30 seconds
+
+        const dataElements = {
+            energyEfficiency: document.getElementById('energyEfficiency'),
+            sustainabilityScore: document.getElementById('sustainabilityScore'),
+            costSavings: document.getElementById('costSavings'),
+            metricsBar: document.getElementById('metricsBar')
+        };
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/electric-car/metrics`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        function updateDashboard(data) {
+            if (!data) return;
+            
+            updateValue(dataElements.energyEfficiency, `${data.energyEfficiency}%`);
+            updateValue(dataElements.sustainabilityScore, data.sustainabilityScore);
+            updateValue(dataElements.costSavings, `$${data.costSavings}M`);
+            
+            const metricsText = `CARBON OFFSET ${data.carbonOffset}T | RENEWABLE ENERGY ${data.renewableEnergy}% | VENDOR ECO-SCORE ${data.vendorEcoScore}/10`;
+            updateValue(dataElements.metricsBar, metricsText);
+        }
+
+        function updateValue(element, newValue) {
+            if (element.textContent !== String(newValue)) {
+                element.classList.add('updating');
+                element.textContent = newValue;
+                setTimeout(() => element.classList.remove('updating'), 600);
+            }
+        }
+
+        async function init() {
+            const data = await fetchDashboardData();
+            updateDashboard(data);
+            
+            setInterval(async () => {
+                const data = await fetchDashboardData();
+                updateDashboard(data);
+            }, UPDATE_INTERVAL);
+        }
+
+        init();
+    </script>
+</body>
+</html>

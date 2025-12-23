@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Truck Dashboard - Velocity BI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('/dashboards/luxury_truck_dashboard.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .data-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .data-value {
+            position: absolute;
+            font-weight: 700;
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+
+        /* Gauge positioning - adjust these values based on your image */
+        .open-pos {
+            top: 50%;
+            left: 18%;
+            font-size: 5rem;
+            color: #F59E0B;
+        }
+
+        .vendor-rating {
+            top: 50%;
+            left: 38%;
+            font-size: 5rem;
+            color: #F59E0B;
+        }
+
+        .spend-velocity {
+            top: 50%;
+            left: 62%;
+            font-size: 4rem;
+            color: #F59E0B;
+        }
+
+        .compliance {
+            top: 50%;
+            left: 82%;
+            font-size: 5rem;
+            color: #F59E0B;
+        }
+
+        /* Secondary metrics strip */
+        .secondary-strip {
+            top: 88%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+            color: #F59E0B;
+            text-align: center;
+            width: 90%;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 10px;
+            height: 10px;
+            background: #F59E0B;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .data-value.updating {
+            animation: flash 0.5s ease;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; transform: scale(1.1); }
+            100% { opacity: 1; }
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 0.75rem 1.5rem;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #F59E0B;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <a href="/" class="back-button">← Back to Dashboard Selector</a>
+        
+        <div class="data-overlay">
+            <div class="data-value open-pos" id="openPOs">127</div>
+            <div class="data-value vendor-rating" id="vendorRating">8.9/10</div>
+            <div class="data-value spend-velocity" id="spendVelocity">$2.4M</div>
+            <div class="data-value compliance" id="compliance">94%</div>
+            
+            <div class="data-value secondary-strip" id="secondaryMetrics">
+                PO AVG $18,500 | ON-TIME DELIVERY 91% | INVOICE ACCURACY 98%
+            </div>
+            
+            <div class="loading-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        const UPDATE_INTERVAL = 30000; // 30 seconds
+
+        const dataElements = {
+            openPOs: document.getElementById('openPOs'),
+            vendorRating: document.getElementById('vendorRating'),
+            spendVelocity: document.getElementById('spendVelocity'),
+            compliance: document.getElementById('compliance'),
+            secondaryMetrics: document.getElementById('secondaryMetrics')
+        };
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/luxury-truck/metrics`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        function updateDashboard(data) {
+            if (!data) return;
+            
+            updateValue(dataElements.openPOs, data.openPOs);
+            updateValue(dataElements.vendorRating, `${data.vendorRating}/10`);
+            updateValue(dataElements.spendVelocity, `$${data.spendVelocity}M`);
+            updateValue(dataElements.compliance, `${data.contractCompliance}%`);
+            
+            const secondaryText = `PO AVG $${data.poAverage.toLocaleString()} | ON-TIME DELIVERY ${data.onTimeDelivery}% | INVOICE ACCURACY ${data.invoiceAccuracy}%`;
+            updateValue(dataElements.secondaryMetrics, secondaryText);
+        }
+
+        function updateValue(element, newValue) {
+            if (element.textContent !== String(newValue)) {
+                element.classList.add('updating');
+                element.textContent = newValue;
+                setTimeout(() => element.classList.remove('updating'), 500);
+            }
+        }
+
+        async function init() {
+            const data = await fetchDashboardData();
+            updateDashboard(data);
+            
+            setInterval(async () => {
+                const data = await fetchDashboardData();
+                updateDashboard(data);
+            }, UPDATE_INTERVAL);
+        }
+
+        init();
+    </script>
+</body>
+</html>

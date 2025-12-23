@@ -166,6 +166,83 @@ def get_executive_summary():
         'status': 'success'
     })
 
+@app.route('/api/vendor-scorecard/metrics')
+def vendor_scorecard_metrics():
+    """Vendor Performance Scorecard metrics"""
+    return jsonify({
+        'timestamp': datetime.now().isoformat(),
+        'poVolume': random.randint(300, 400),
+        'vendorPerformance': round(random.uniform(90, 98), 1),
+        'budgetUtilization': random.randint(60, 75),
+        'sowCompliance': random.randint(85, 95),
+        'activeContracts': random.randint(140, 170),
+        'status': 'success'
+    })
+
+@app.route('/api/workforce-hud/metrics')
+def workforce_hud_metrics():
+    """Workforce Holographic HUD metrics"""
+    return jsonify({
+        'timestamp': datetime.now().isoformat(),
+        'activeContractors': random.randint(1200, 1300),
+        'utilizationRate': random.randint(82, 92),
+        'avgTimeToFill': random.randint(10, 15),
+        'onboardingQueue': random.randint(25, 45),
+        'complianceRate': random.randint(94, 98),
+        'trendData': [random.randint(75, 95) for _ in range(7)],
+        'status': 'success'
+    })
+
+@app.route('/api/luxury-truck/metrics')
+def luxury_truck_metrics():
+    """Luxury Truck Dashboard metrics"""
+    return jsonify({
+        'timestamp': datetime.now().isoformat(),
+        'openPOs': random.randint(110, 145),
+        'vendorRating': round(random.uniform(8.5, 9.2), 1),
+        'spendVelocity': round(random.uniform(2.0, 2.8), 1),
+        'contractCompliance': random.randint(90, 96),
+        'poAverage': random.randint(17000, 20000),
+        'onTimeDelivery': random.randint(88, 94),
+        'invoiceAccuracy': random.randint(96, 99),
+        'status': 'success'
+    })
+
+@app.route('/api/electric-car/metrics')
+def electric_car_metrics():
+    """Electric Car Dashboard metrics"""
+    return jsonify({
+        'timestamp': datetime.now().isoformat(),
+        'energyEfficiency': random.randint(90, 98),
+        'sustainabilityScore': random.choice(['A+', 'A', 'A-']),
+        'costSavings': round(random.uniform(1.0, 1.5), 1),
+        'carbonOffset': random.randint(400, 500),
+        'renewableEnergy': random.randint(82, 92),
+        'vendorEcoScore': round(random.uniform(8.5, 9.5), 1),
+        'status': 'success'
+    })
+
+@app.route('/api/future-truck/metrics')
+def future_truck_metrics():
+    """Future Truck Dashboard metrics"""
+    data_stream_messages = [
+        'Global component demand spike',
+        'Energy cost fluctuation detected',
+        'Delivery delay risk assessment',
+        'Smart contract execution complete',
+        'Supplier credit rating change'
+    ]
+    return jsonify({
+        'timestamp': datetime.now().isoformat(),
+        'aiPredictionAccuracy': round(random.uniform(97.5, 99.2), 1),
+        'autonomousSourcing': random.randint(145, 170),
+        'fleetUtilization': [random.randint(75, 95) for _ in range(7)],
+        'supplyChainResilience': random.randint(88, 95),
+        'riskDetection': random.randint(2, 5),
+        'dataStream': '... '.join(random.sample(data_stream_messages, 3)) + '...',
+        'status': 'success'
+    })
+
 @app.route('/api/health')
 def health_check():
     """Health check endpoint"""
@@ -173,7 +250,8 @@ def health_check():
         'status': 'healthy',
         'service': 'Velocity Dashboard API',
         'timestamp': datetime.now().isoformat(),
-        'version': '1.0.0'
+        'version': '1.0.0',
+        'dashboards_available': 15
     })
 
 # ============================================================================
