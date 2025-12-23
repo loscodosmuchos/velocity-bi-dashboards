@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance & Risk Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .dashboard-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('/dashboards/compliance_risk_generated.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .data-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .data-value {
+            position: absolute;
+            font-weight: 700;
+            text-shadow: 0 0 10px currentColor;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+
+        .gauge-1-value {
+            top: 52%;
+            left: 12%;
+            font-size: 4rem;
+            color: #F59E0B;
+        }
+
+        .gauge-2-value {
+            top: 52%;
+            left: 28%;
+            font-size: 4rem;
+            color: #EF4444;
+        }
+
+        .gauge-3-value {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 6rem;
+            color: #10B981;
+        }
+
+        .gauge-4-value {
+            top: 52%;
+            left: 72%;
+            font-size: 4rem;
+            color: #F59E0B;
+        }
+
+        .gauge-5-value {
+            top: 52%;
+            left: 88%;
+            font-size: 4rem;
+            color: #38BDF8;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 10px;
+            height: 10px;
+            background: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .data-value.updating {
+            animation: flash 0.5s ease;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; transform: scale(1.1); }
+            100% { opacity: 1; }
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 0.75rem 1.5rem;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38BDF8;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: rgba(56, 189, 248, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <a href="/" class="back-button">← Back to Dashboard Selector</a>
+        
+        <div class="data-overlay">
+            <div class="data-value gauge-1-value" id="openExceptions">--</div>
+            <div class="data-value gauge-2-value" id="sowViolations">--</div>
+            <div class="data-value gauge-3-value" id="complianceScore">--%</div>
+            <div class="data-value gauge-4-value" id="certificationGaps">--</div>
+            <div class="data-value gauge-5-value" id="auditStatus">--</div>
+            <div class="loading-indicator"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = window.location.origin + '/api';
+        const UPDATE_INTERVAL = 30000;
+
+        const dataElements = {
+            openExceptions: document.getElementById('openExceptions'),
+            sowViolations: document.getElementById('sowViolations'),
+            complianceScore: document.getElementById('complianceScore'),
+            certificationGaps: document.getElementById('certificationGaps'),
+            auditStatus: document.getElementById('auditStatus')
+        };
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/compliance/metrics`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        function updateDashboard(data) {
+            if (!data) return;
+            
+            updateValue(dataElements.openExceptions, data.openExceptions);
+            updateValue(dataElements.sowViolations, data.sowViolations);
+            updateValue(dataElements.complianceScore, `${data.complianceScore}%`);
+            updateValue(dataElements.certificationGaps, data.certificationGaps);
+            updateValue(dataElements.auditStatus, data.auditStatus);
+        }
+
+        function updateValue(element, newValue) {
+            if (element.textContent !== String(newValue)) {
+                element.classList.add('updating');
+                element.textContent = newValue;
+                setTimeout(() => element.classList.remove('updating'), 500);
+            }
+        }
+
+        async function init() {
+            const data = await fetchDashboardData();
+            updateDashboard(data);
+            setInterval(async () => {
+                const data = await fetchDashboardData();
+                updateDashboard(data);
+            }, UPDATE_INTERVAL);
+        }
+
+        init();
+    </script>
+</body>
+</html>

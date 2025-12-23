@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velocity Executive Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #38BDF8, #10B981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 1rem;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .dashboard-card:hover {
+            background: rgba(56, 189, 248, 0.1);
+            border-color: rgba(56, 189, 248, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .dashboard-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #38BDF8;
+        }
+
+        .dashboard-card p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>VELOCITY EXECUTIVE COMMAND CENTER</h1>
+        <p class="subtitle">
+            <span class="status-indicator"></span>
+            Luxury Supercar-Inspired Business Intelligence
+        </p>
+    </div>
+
+    <div class="dashboard-grid">
+        <a href="/dashboard/compliance" class="dashboard-card">
+            <h2>Compliance & Risk Monitor</h2>
+            <p>Real-time compliance tracking with 5 circular gauges displaying exceptions, violations, compliance score, certification gaps, and audit status.</p>
+        </a>
+
+        <a href="/dashboard/procurement" class="dashboard-card">
+            <h2>Procurement Performance</h2>
+            <p>Core procurement KPIs with vintage luxury aesthetic featuring PO volume, spend rate, and vendor count metrics.</p>
+        </a>
+
+        <a href="/dashboard/velocity" class="dashboard-card">
+            <h2>Procurement Velocity Monitor</h2>
+            <p>Futuristic HUD-style dashboard tracking purchase order velocity, vendor compliance rate, and budget burn rate with neon accents.</p>
+        </a>
+
+        <a href="/dashboard/workforce" class="dashboard-card">
+            <h2>Workforce Analytics</h2>
+            <p>VMS/ATS command center with industrial metal aesthetic displaying contractor utilization, time-to-fill, onboarding pipeline, and active placements.</p>
+        </a>
+
+        <a href="/dashboard/executive" class="dashboard-card">
+            <h2>Executive Summary</h2>
+            <p>Strategic overview combining all key metrics with mixed premium materials - carbon fiber, burled wood, and brushed metal.</p>
+        </a>
+    </div>
+
+    <div class="footer">
+        <p>Velocity Dashboard System v1.0.0 | METHOD 3: Image Background + Data Overlay</p>
+    </div>
+</body>
+</html>
