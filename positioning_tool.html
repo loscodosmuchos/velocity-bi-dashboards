@@ -6,7 +6,7 @@
     <title>Dashboard Positioning Tool - Velocity BI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhana:wght@400;600;700&family=Michroma&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhana:wght@400;600;700&family=Michroma&family=JetBrains+Mono:wght@400;700&family=Audiowide&family=Saira+Condensed:wght@400;600;700&family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -141,12 +141,12 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
             font-size: 0.9vw;
-            color: rgba(255, 255, 255, 0.7);
             transform: translate(-50%, -100%);
             margin-top: -3vw;
             pointer-events: none;
             z-index: 100;
             white-space: nowrap;
+            opacity: 0.85;
         }
 
         .output {
@@ -257,7 +257,16 @@
                     <option value="'Rajdhana', sans-serif">Rajdhana - Automotive/Speed</option>
                     <option value="'Michroma', sans-serif">Michroma - Industrial/Precision</option>
                     <option value="'JetBrains Mono', monospace">JetBrains Mono - Data/Metrics</option>
+                    <option value="'Audiowide', sans-serif">Audiowide - Racing/Speed</option>
+                    <option value="'Saira Condensed', sans-serif">Saira Condensed - Modern/Clean</option>
+                    <option value="'Teko', sans-serif">Teko - Bold/Industrial</option>
                 </select>
+            </div>
+
+            <div class="control-group">
+                <label for="colorPicker">Label Color:</label>
+                <input type="color" id="colorPicker" value="#ffffff" onchange="updateColorPreview()" style="width: 60px; height: 35px; cursor: pointer;">
+                <span id="colorValue" style="margin-left: 10px; color: #10B981;">#ffffff</span>
             </div>
 
             <button onclick="loadImage()">Load Image</button>
@@ -294,6 +303,7 @@
         const sampleValues = [12, 38, '92%', 7, 3, 156, '88%', 24, 1281, '90%', 15, 30];
         let gaugeLabels = [];
         let selectedFont = "'Orbitron', sans-serif";
+        let selectedColor = '#ffffff';
 
         // Auto-save to localStorage
         function autoSave() {
@@ -303,6 +313,7 @@
                 positions: positions,
                 labels: gaugeLabels,
                 font: selectedFont,
+                color: selectedColor,
                 timestamp: new Date().toISOString()
             };
             localStorage.setItem('dashboard_config', JSON.stringify(config));
@@ -494,6 +505,7 @@
                 labelDiv.style.left = pos.x + '%';
                 labelDiv.style.top = pos.y + '%';
                 labelDiv.style.fontFamily = selectedFont;
+                labelDiv.style.color = selectedColor;
                 labelDiv.textContent = gaugeLabels[index] || `Gauge ${index + 1}`;
                 labelDiv.dataset.preview = 'true';
                 container.appendChild(labelDiv);
@@ -513,6 +525,17 @@
 
         function updateFontPreview() {
             selectedFont = document.getElementById('fontSelect').value;
+            autoSave();
+            if (previewMode) {
+                const container = document.getElementById('imageContainer');
+                hidePreview(container);
+                showPreview(container);
+            }
+        }
+
+        function updateColorPreview() {
+            selectedColor = document.getElementById('colorPicker').value;
+            document.getElementById('colorValue').textContent = selectedColor;
             autoSave();
             if (previewMode) {
                 const container = document.getElementById('imageContainer');
@@ -545,14 +568,25 @@
                 positions: positions,
                 labels: gaugeLabels,
                 font: selectedFont,
+                color: selectedColor,
                 timestamp: new Date().toISOString()
             };
+
+            // Generate filename with date/time
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0]; // 2025-12-24
+            const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-'); // 21-30-45
+            const baseName = currentImage.replace('_clean.png', '').replace('.png', '');
+            const defaultFilename = `${baseName}_${dateStr}_${timeStr}_config.json`;
+            
+            const customName = prompt('Save configuration as:', defaultFilename);
+            if (!customName) return; // User cancelled
 
             const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${currentImage.replace('.png', '')}_config.json`;
+            a.download = customName.endsWith('.json') ? customName : customName + '.json';
             a.click();
             URL.revokeObjectURL(url);
 
@@ -572,11 +606,14 @@
                     positions = config.positions || [];
                     gaugeLabels = config.labels || [];
                     selectedFont = config.font || "'Orbitron', sans-serif";
+                    selectedColor = config.color || '#ffffff';
                     
                     // Set form values
                     document.getElementById('imageSelect').value = config.image;
                     document.getElementById('gaugeCount').value = config.gaugeCount;
                     document.getElementById('fontSelect').value = selectedFont;
+                    document.getElementById('colorPicker').value = selectedColor;
+                    document.getElementById('colorValue').textContent = selectedColor;
                     
                     // Set current state
                     currentImage = config.image;
