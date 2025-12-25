@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compliance & Risk Monitor</title>
+    <title>Compliance & Risk Monitor - Velocity BI</title>
     <style>
         * {
             margin: 0;
@@ -18,17 +18,16 @@
         }
 
         .dashboard-container {
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100vw;
             height: 100vh;
             background-image: url('/dashboards/compliance_risk_carbon_clean.png');
-            background-size: contain;
+            background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-color: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .data-overlay {
@@ -43,29 +42,30 @@
         .data-value {
             position: absolute;
             font-weight: 700;
-            text-shadow: 0 0 10px currentColor;
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
             letter-spacing: 0.05em;
-            transition: all 0.3s ease;
-            opacity: 0; /* Hide initially until data loads */
+            transition: opacity 0.3s ease;
+            opacity: 0;
         }
 
         .data-value.loaded {
             opacity: 1;
         }
 
+        /* Precise positioning based on actual image - 5 gauges in a row */
         .gauge-1-value {
             top: 50%;
-            left: 16%;
+            left: 13%;
             transform: translate(-50%, -50%);
-            font-size: 3.5vw;
+            font-size: 3rem;
             color: #F59E0B;
         }
 
         .gauge-2-value {
             top: 50%;
-            left: 32%;
+            left: 29%;
             transform: translate(-50%, -50%);
-            font-size: 3.5vw;
+            font-size: 3rem;
             color: #EF4444;
         }
 
@@ -73,23 +73,23 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 5vw;
+            font-size: 4.5rem;
             color: #10B981;
         }
 
         .gauge-4-value {
             top: 50%;
-            left: 68%;
+            left: 71%;
             transform: translate(-50%, -50%);
-            font-size: 3.5vw;
+            font-size: 2.5rem;
             color: #F59E0B;
         }
 
         .gauge-5-value {
             top: 50%;
-            left: 84%;
+            left: 87%;
             transform: translate(-50%, -50%);
-            font-size: 3.5vw;
+            font-size: 2.5rem;
             color: #38BDF8;
         }
 
@@ -110,24 +110,14 @@
             50% { opacity: 0.3; }
         }
 
-        .data-value.updating {
-            animation: flash 0.5s ease;
-        }
-
-        @keyframes flash {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; transform: scale(1.1); }
-            100% { opacity: 1; }
-        }
-
         .back-button {
             position: absolute;
             top: 20px;
             left: 20px;
             padding: 0.75rem 1.5rem;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: #38BDF8;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10B981;
             text-decoration: none;
             border-radius: 0.5rem;
             font-size: 0.875rem;
@@ -137,8 +127,8 @@
         }
 
         .back-button:hover {
-            background: rgba(56, 189, 248, 0.2);
-            border-color: rgba(56, 189, 248, 0.5);
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.5);
         }
     </style>
 </head>
@@ -147,25 +137,26 @@
         <a href="/" class="back-button">← Back to Dashboard Selector</a>
         
         <div class="data-overlay">
-            <div class="data-value gauge-1-value" id="openExceptions">--</div>
-            <div class="data-value gauge-2-value" id="sowViolations">--</div>
-            <div class="data-value gauge-3-value" id="complianceScore">--%</div>
-            <div class="data-value gauge-4-value" id="certificationGaps">--</div>
-            <div class="data-value gauge-5-value" id="auditStatus">--</div>
+            <div class="data-value gauge-1-value" id="gauge1">--</div>
+            <div class="data-value gauge-2-value" id="gauge2">--</div>
+            <div class="data-value gauge-3-value" id="gauge3">--</div>
+            <div class="data-value gauge-4-value" id="gauge4">--</div>
+            <div class="data-value gauge-5-value" id="gauge5">--</div>
+            
             <div class="loading-indicator"></div>
         </div>
     </div>
 
     <script>
         const API_BASE_URL = window.location.origin + '/api';
-        const UPDATE_INTERVAL = 30000;
+        const UPDATE_INTERVAL = 30000; // 30 seconds
 
         const dataElements = {
-            openExceptions: document.getElementById('openExceptions'),
-            sowViolations: document.getElementById('sowViolations'),
-            complianceScore: document.getElementById('complianceScore'),
-            certificationGaps: document.getElementById('certificationGaps'),
-            auditStatus: document.getElementById('auditStatus')
+            gauge1: document.getElementById('gauge1'),
+            gauge2: document.getElementById('gauge2'),
+            gauge3: document.getElementById('gauge3'),
+            gauge4: document.getElementById('gauge4'),
+            gauge5: document.getElementById('gauge5')
         };
 
         async function fetchDashboardData() {
@@ -182,25 +173,26 @@
         function updateDashboard(data) {
             if (!data) return;
             
-            updateValue(dataElements.openExceptions, data.openExceptions);
-            updateValue(dataElements.sowViolations, data.sowViolations);
-            updateValue(dataElements.complianceScore, `${data.complianceScore}%`);
-            updateValue(dataElements.certificationGaps, data.certificationGaps);
-            updateValue(dataElements.auditStatus, data.auditStatus);
+            // Update each gauge with proper formatting
+            updateValue(dataElements.gauge1, data.openExceptions || 0);
+            updateValue(dataElements.gauge2, data.sowViolations || 0);
+            updateValue(dataElements.gauge3, `${data.complianceScore || 0}%`);
+            updateValue(dataElements.gauge4, data.certificationGaps || 0);
+            updateValue(dataElements.gauge5, data.auditStatus || 0);
+            
+            // Fade in all values
+            Object.values(dataElements).forEach(el => el.classList.add('loaded'));
         }
 
         function updateValue(element, newValue) {
-            element.classList.add('loaded'); // Make visible
-            if (element.textContent !== String(newValue)) {
-                element.classList.add('updating');
-                element.textContent = newValue;
-                setTimeout(() => element.classList.remove('updating'), 500);
-            }
+            element.textContent = newValue;
         }
 
         async function init() {
             const data = await fetchDashboardData();
             updateDashboard(data);
+            
+            // Update every 30 seconds
             setInterval(async () => {
                 const data = await fetchDashboardData();
                 updateDashboard(data);
