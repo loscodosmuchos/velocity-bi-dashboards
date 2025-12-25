@@ -21,7 +21,12 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-image: url('/dashboards/workforce_holographic_hud.png');
+            background-image: url('/dashboards/workforce_holographic_hud_clean.png');
+            background-size: contain;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -50,31 +55,51 @@
         }
 
         .active-contractors {
-            top: 40%;
+            top: 35%;
             left: 20%;
-            font-size: 5rem;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #38BDF8;
         }
 
         .utilization-rate {
-            top: 40%;
+            top: 35%;
             left: 50%;
-            font-size: 6rem;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #10B981;
         }
 
         .time-to-fill {
-            top: 40%;
+            top: 35%;
             left: 80%;
-            font-size: 5rem;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #F59E0B;
         }
 
         .onboarding-queue {
             top: 65%;
-            left: 35%;
-            font-size: 4rem;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #EF4444;
+        }
+
+        .compliance-rate {
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
+            color: #10B981;
+        }
+
+        .avg-time-fill {
+            top: 65%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
+            color: #38BDF8;
         }
 
         .loading-indicator {

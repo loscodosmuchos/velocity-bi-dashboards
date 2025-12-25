@@ -21,7 +21,12 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-image: url('/dashboards/future_truck_dashboard.png');
+            background-image: url('/dashboards/future_truck_dashboard_clean.png');
+            background-size: contain;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -45,32 +50,44 @@
         }
 
         /* Hexagonal layout positioning */
-        .hex-tl {
-            top: 22%;
-            left: 22%;
-            font-size: 4.5rem;
+        .hex-1 {
+            top: 50%;
+            left: 15%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
             color: #38BDF8;
         }
 
-        .hex-tr {
-            top: 22%;
-            left: 78%;
-            font-size: 4.5rem;
+        .hex-2 {
+            top: 50%;
+            left: 30%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
             color: #38BDF8;
         }
 
-        .hex-bl {
-            top: 68%;
-            left: 22%;
-            font-size: 4.5rem;
-            color: #38BDF8;
+        .hex-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
+            color: #10B981;
         }
 
-        .hex-br {
-            top: 68%;
-            left: 78%;
-            font-size: 4.5rem;
+        .hex-4 {
+            top: 50%;
+            left: 70%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
             color: #F59E0B;
+        }
+
+        .hex-5 {
+            top: 50%;
+            left: 85%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
+            color: #EF4444;
         }
 
         /* Data stream ticker at bottom */

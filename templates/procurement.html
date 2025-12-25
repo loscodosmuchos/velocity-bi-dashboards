@@ -21,10 +21,14 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-image: url('/dashboards/vendor_performance_scorecard.png');
-            background-size: cover;
+            background-image: url('/dashboards/vendor_performance_scorecard_clean.png');
+            background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .data-overlay {
@@ -51,23 +55,34 @@
 
         .po-volume {
             top: 50%;
-            left: 18%;
-            font-size: 5rem;
+            left: 25%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #38BDF8;
         }
 
         .vendor-performance {
             top: 50%;
-            left: 40%;
-            font-size: 6rem;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #10B981;
         }
 
         .budget-utilization {
             top: 50%;
-            left: 62%;
-            font-size: 5rem;
+            left: 63%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #F59E0B;
+        }
+
+        .sow-compliance {
+            top: 50%;
+            left: 76%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
+            color: #EF4444;
         }
 
         .loading-indicator {

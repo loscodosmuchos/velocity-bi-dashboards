@@ -21,7 +21,12 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-image: url('/dashboards/luxury_truck_dashboard.png');
+            background-image: url('/dashboards/luxury_truck_dashboard_clean.png');
+            background-size: contain;
+            background-color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -47,29 +52,33 @@
         /* Gauge positioning - adjust these values based on your image */
         .open-pos {
             top: 50%;
-            left: 18%;
-            font-size: 5rem;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #F59E0B;
         }
 
         .vendor-rating {
             top: 50%;
-            left: 38%;
-            font-size: 5rem;
+            left: 40%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #F59E0B;
         }
 
         .spend-velocity {
             top: 50%;
-            left: 62%;
-            font-size: 4rem;
+            left: 60%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #F59E0B;
         }
 
         .compliance {
             top: 50%;
-            left: 82%;
-            font-size: 5rem;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #F59E0B;
         }
 

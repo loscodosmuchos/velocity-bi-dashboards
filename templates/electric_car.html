@@ -21,7 +21,12 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-image: url('/dashboards/electric_car_dashboard.png');
+            background-image: url('/dashboards/electric_car_dashboard_clean.png');
+            background-size: contain;
+            background-color: #F5F5F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -45,26 +50,55 @@
 
         /* Gauge positioning for electric car - clean minimalist layout */
         .energy-efficiency {
-            top: 45%;
+            top: 35%;
             left: 20%;
-            font-size: 5.5rem;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #10B981;
             font-weight: 200;
         }
 
         .sustainability-score {
-            top: 45%;
+            top: 35%;
             left: 50%;
-            transform: translateX(-50%);
-            font-size: 6rem;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
             color: #10B981;
             font-weight: 200;
         }
 
         .cost-savings {
-            top: 45%;
-            right: 20%;
-            font-size: 5.5rem;
+            top: 35%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            font-size: 4vw;
+            color: #10B981;
+            font-weight: 200;
+        }
+
+        .carbon-offset {
+            top: 65%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
+            color: #10B981;
+            font-weight: 200;
+        }
+
+        .renewable-energy {
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
+            color: #10B981;
+            font-weight: 200;
+        }
+
+        .eco-score {
+            top: 65%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
             color: #10B981;
             font-weight: 200;
         }
