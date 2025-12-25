@@ -121,6 +121,17 @@
             white-space: nowrap;
         }
 
+        .preview-value {
+            position: absolute;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-weight: 700;
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+            letter-spacing: 0.05em;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 100;
+        }
+
         .output {
             background: #2a2a2a;
             padding: 20px;
@@ -223,6 +234,7 @@
             </div>
 
             <button onclick="loadImage()">Load Image</button>
+            <button class="secondary" onclick="togglePreview()">👁️ Preview with Sample Data</button>
             <button class="secondary" onclick="reset()">Reset</button>
             <button class="secondary" onclick="copyCSS()">Copy CSS Code</button>
         </div>
@@ -247,6 +259,8 @@
         let imageWidth = 0;
         let imageHeight = 0;
         let currentImage = null;
+        let previewMode = false;
+        const sampleValues = [12, 38, '92%', 7, 3, 156, '88%', 24, 1281, '90%', 15, 30];
 
         function loadImage() {
             const imageSelect = document.getElementById('imageSelect');
@@ -375,6 +389,52 @@
                 console.error('Failed to copy:', err);
                 alert('Failed to copy. Please select and copy manually.');
             });
+        }
+
+        function togglePreview() {
+            if (positions.length === 0) {
+                alert('Please click on gauge positions first!');
+                return;
+            }
+
+            const container = document.getElementById('imageContainer');
+            if (!container) {
+                alert('Please load an image first!');
+                return;
+            }
+
+            previewMode = !previewMode;
+            const btn = event.target;
+            
+            if (previewMode) {
+                btn.textContent = '❌ Hide Preview';
+                showPreview(container);
+            } else {
+                btn.textContent = '👁️ Preview with Sample Data';
+                hidePreview(container);
+            }
+        }
+
+        function showPreview(container) {
+            const rect = container.getBoundingClientRect();
+            const colors = ['#F59E0B', '#EF4444', '#10B981', '#F59E0B', '#38BDF8', '#10B981', '#F59E0B', '#EF4444', '#38BDF8', '#10B981', '#F59E0B', '#38BDF8'];
+            
+            positions.forEach((pos, index) => {
+                const preview = document.createElement('div');
+                preview.className = 'preview-value';
+                preview.style.left = pos.x + '%';
+                preview.style.top = pos.y + '%';
+                preview.style.fontSize = '3.5vw';
+                preview.style.color = colors[index % colors.length];
+                preview.textContent = sampleValues[index % sampleValues.length];
+                preview.dataset.preview = 'true';
+                container.appendChild(preview);
+            });
+        }
+
+        function hidePreview(container) {
+            const previews = container.querySelectorAll('[data-preview="true"]');
+            previews.forEach(p => p.remove());
         }
     </script>
 </body>
