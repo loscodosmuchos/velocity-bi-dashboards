@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Positioning Tool - Velocity BI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #10B981;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #10B981;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #10B981;
+            color: #fff;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        button {
+            background: #10B981;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #0ea571;
+        }
+
+        button.secondary {
+            background: #F59E0B;
+        }
+
+        button.secondary:hover {
+            background: #d97706;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+            background: #000;
+            border: 2px solid #10B981;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .dashboard-image {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(16, 185, 129, 0.8);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 1);
+        }
+
+        .marker-label {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10B981;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .output {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .output h2 {
+            color: #10B981;
+            margin-bottom: 15px;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid #10B981;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .position-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .position-list li {
+            background: #1a1a1a;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            border-left: 3px solid #10B981;
+        }
+
+        .instructions {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #F59E0B;
+        }
+
+        .instructions h3 {
+            color: #F59E0B;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Dashboard Positioning Tool</h1>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Select a dashboard image from the dropdown</li>
+                <li>Enter the number of gauges/data points</li>
+                <li>Click "Load Image"</li>
+                <li>Click on the CENTER of each gauge (in order: left to right, top to bottom)</li>
+                <li>Copy the generated CSS code into your template</li>
+                <li>Click "Reset" to start over or position another dashboard</li>
+            </ol>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="imageSelect">Select Dashboard Image:</label>
+                <select id="imageSelect">
+                    <option value="">-- Select an image --</option>
+                    <option value="compliance_risk_carbon_clean.png">Compliance & Risk Monitor (5 gauges)</option>
+                    <option value="vendor_performance_scorecard_clean.png">Vendor Performance Scorecard (4 gauges)</option>
+                    <option value="workforce_holographic_hud_clean.png">Workforce Holographic HUD (6 panels)</option>
+                    <option value="luxury_truck_dashboard_clean.png">Luxury Truck Dashboard (4 gauges)</option>
+                    <option value="electric_car_dashboard_clean.png">Electric Car Dashboard (6 gauges)</option>
+                    <option value="future_truck_dashboard_clean.png">Future Truck Dashboard (5 hexagons)</option>
+                    <option value="procurement_velocity_neon_clean.png">Procurement Velocity Neon (3 panels)</option>
+                    <option value="contract_lifecycle_wood_clean.png">Contract Lifecycle Wood (6 gauges)</option>
+                    <option value="workforce_industrial_metal_clean.png">Workforce Industrial Metal (4 panels)</option>
+                    <option value="operations_monitor_industrial_clean.png">Operations Monitor Industrial (3 panels)</option>
+                    <option value="vendor_scorecard_flat_clean.png">Vendor Scorecard Flat (4 gauges)</option>
+                    <option value="compliance_analog_gauges_clean.png">Compliance Analog Gauges (3 gauges)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="gaugeCount">Number of Gauges/Data Points:</label>
+                <input type="number" id="gaugeCount" min="1" max="12" value="5" placeholder="Enter number of gauges">
+            </div>
+
+            <button onclick="loadImage()">Load Image</button>
+            <button class="secondary" onclick="reset()">Reset</button>
+            <button class="secondary" onclick="copyCSS()">Copy CSS Code</button>
+        </div>
+
+        <div id="imageWrapper"></div>
+
+        <div class="output" id="output" style="display: none;">
+            <h2>📍 Recorded Positions:</h2>
+            <ul class="position-list" id="positionList"></ul>
+
+            <h2>💻 Generated CSS Code:</h2>
+            <div class="code-block" id="cssOutput"></div>
+
+            <h2>📝 HTML Data Elements:</h2>
+            <div class="code-block" id="htmlOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        let positions = [];
+        let maxGauges = 5;
+        let imageWidth = 0;
+        let imageHeight = 0;
+        let currentImage = null;
+
+        function loadImage() {
+            const imageSelect = document.getElementById('imageSelect');
+            const gaugeCount = document.getElementById('gaugeCount');
+            const imageName = imageSelect.value;
+            
+            if (!imageName) {
+                alert('Please select an image first!');
+                return;
+            }
+
+            maxGauges = parseInt(gaugeCount.value);
+            if (maxGauges < 1 || maxGauges > 12) {
+                alert('Please enter a valid number of gauges (1-12)');
+                return;
+            }
+
+            reset();
+
+            const imageWrapper = document.getElementById('imageWrapper');
+            const container = document.createElement('div');
+            container.className = 'image-container';
+            container.id = 'imageContainer';
+
+            const img = document.createElement('img');
+            img.className = 'dashboard-image';
+            img.src = `/dashboards/${imageName}`;
+            currentImage = imageName;
+
+            img.onload = function() {
+                imageWidth = this.naturalWidth;
+                imageHeight = this.naturalHeight;
+                console.log(`Image loaded: ${imageWidth}x${imageHeight}`);
+            };
+
+            container.appendChild(img);
+            container.addEventListener('click', handleClick);
+            imageWrapper.appendChild(container);
+        }
+
+        function handleClick(event) {
+            if (positions.length >= maxGauges) {
+                alert(`Maximum ${maxGauges} positions recorded. Click Reset to start over.`);
+                return;
+            }
+
+            const container = event.currentTarget;
+            const rect = container.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // Calculate percentage positions
+            const xPercent = (x / rect.width * 100).toFixed(1);
+            const yPercent = (y / rect.height * 100).toFixed(1);
+
+            positions.push({
+                x: xPercent,
+                y: yPercent,
+                index: positions.length + 1
+            });
+
+            // Add visual marker
+            const marker = document.createElement('div');
+            marker.className = 'marker';
+            marker.style.left = x + 'px';
+            marker.style.top = y + 'px';
+
+            const label = document.createElement('div');
+            label.className = 'marker-label';
+            label.textContent = `G${positions.length}`;
+            marker.appendChild(label);
+
+            container.appendChild(marker);
+
+            updateOutput();
+        }
+
+        function updateOutput() {
+            const output = document.getElementById('output');
+            const positionList = document.getElementById('positionList');
+            const cssOutput = document.getElementById('cssOutput');
+            const htmlOutput = document.getElementById('htmlOutput');
+
+            output.style.display = 'block';
+
+            // Update position list
+            positionList.innerHTML = positions.map(p => 
+                `<li>Gauge ${p.index}: X=${p.x}%, Y=${p.y}%</li>`
+            ).join('');
+
+            // Generate CSS
+            const cssCode = positions.map(p => `
+        .gauge-${p.index}-value {
+            top: ${p.y}%;
+            left: ${p.x}%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5vw;
+            color: #10B981; /* Change color as needed */
+        }`).join('\n');
+
+            cssOutput.textContent = cssCode;
+
+            // Generate HTML
+            const htmlCode = positions.map(p => 
+                `            <div class="data-value gauge-${p.index}-value" id="gauge${p.index}">--</div>`
+            ).join('\n');
+
+            htmlOutput.textContent = htmlCode;
+        }
+
+        function reset() {
+            positions = [];
+            const imageWrapper = document.getElementById('imageWrapper');
+            imageWrapper.innerHTML = '';
+            const output = document.getElementById('output');
+            output.style.display = 'none';
+        }
+
+        function copyCSS() {
+            const cssOutput = document.getElementById('cssOutput');
+            const text = cssOutput.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                alert('CSS code copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>
