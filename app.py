@@ -46,6 +46,11 @@ def executive_dashboard():
     """Executive Summary Dashboard"""
     return render_template('executive.html')
 
+@app.route('/positioning-tool')
+def positioning_tool():
+    """Interactive Dashboard Positioning Tool"""
+    return send_from_directory('.', 'positioning_tool.html')
+
 # ============================================================================
 # SERVE DASHBOARD IMAGES
 # ============================================================================
