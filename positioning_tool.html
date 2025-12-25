@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Positioning Tool - Velocity BI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhana:wght@400;600;700&family=Michroma&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -132,6 +135,20 @@
             z-index: 100;
         }
 
+        .preview-label {
+            position: absolute;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.9vw;
+            color: rgba(255, 255, 255, 0.7);
+            transform: translate(-50%, -100%);
+            margin-top: -3vw;
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+        }
+
         .output {
             background: #2a2a2a;
             padding: 20px;
@@ -233,6 +250,16 @@
                 <input type="number" id="gaugeCount" min="1" max="12" value="5" placeholder="Enter number of gauges">
             </div>
 
+            <div class="control-group">
+                <label for="fontSelect">Label Font Style:</label>
+                <select id="fontSelect" onchange="updateFontPreview()">
+                    <option value="'Orbitron', sans-serif">Orbitron - Futuristic/Tech</option>
+                    <option value="'Rajdhana', sans-serif">Rajdhana - Automotive/Speed</option>
+                    <option value="'Michroma', sans-serif">Michroma - Industrial/Precision</option>
+                    <option value="'JetBrains Mono', monospace">JetBrains Mono - Data/Metrics</option>
+                </select>
+            </div>
+
             <button onclick="loadImage()">Load Image</button>
             <button class="secondary" onclick="togglePreview()">👁️ Preview with Sample Data</button>
             <button class="secondary" onclick="reset()">Reset</button>
@@ -266,6 +293,7 @@
         let previewMode = false;
         const sampleValues = [12, 38, '92%', 7, 3, 156, '88%', 24, 1281, '90%', 15, 30];
         let gaugeLabels = [];
+        let selectedFont = "'Orbitron', sans-serif";
 
         // Auto-save to localStorage
         function autoSave() {
@@ -459,6 +487,17 @@
             const colors = ['#F59E0B', '#EF4444', '#10B981', '#F59E0B', '#38BDF8', '#10B981', '#F59E0B', '#EF4444', '#38BDF8', '#10B981', '#F59E0B', '#38BDF8'];
             
             positions.forEach((pos, index) => {
+                // Add label text above gauge
+                const labelDiv = document.createElement('div');
+                labelDiv.className = 'preview-label';
+                labelDiv.style.left = pos.x + '%';
+                labelDiv.style.top = pos.y + '%';
+                labelDiv.style.fontFamily = selectedFont;
+                labelDiv.textContent = gaugeLabels[index] || `Gauge ${index + 1}`;
+                labelDiv.dataset.preview = 'true';
+                container.appendChild(labelDiv);
+
+                // Add value in center of gauge
                 const preview = document.createElement('div');
                 preview.className = 'preview-value';
                 preview.style.left = pos.x + '%';
@@ -469,6 +508,15 @@
                 preview.dataset.preview = 'true';
                 container.appendChild(preview);
             });
+        }
+
+        function updateFontPreview() {
+            selectedFont = document.getElementById('fontSelect').value;
+            if (previewMode) {
+                const container = document.getElementById('imageContainer');
+                hidePreview(container);
+                showPreview(container);
+            }
         }
 
         function hidePreview(container) {
