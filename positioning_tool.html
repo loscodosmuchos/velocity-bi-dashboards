@@ -236,13 +236,17 @@
             <button onclick="loadImage()">Load Image</button>
             <button class="secondary" onclick="togglePreview()">👁️ Preview with Sample Data</button>
             <button class="secondary" onclick="reset()">Reset</button>
+            <button class="secondary" onclick="saveConfig()">💾 Save Configuration</button>
+            <button class="secondary" onclick="document.getElementById('loadFile').click()">📂 Load Configuration</button>
             <button class="secondary" onclick="copyCSS()">Copy CSS Code</button>
+            <input type="file" id="loadFile" accept=".json" style="display:none" onchange="loadConfig(event)">
         </div>
 
         <div id="imageWrapper"></div>
 
         <div class="output" id="output" style="display: none;">
             <h2>📍 Recorded Positions:</h2>
+            <div id="labelInputs" style="margin-bottom: 20px;"></div>
             <ul class="position-list" id="positionList"></ul>
 
             <h2>💻 Generated CSS Code:</h2>
@@ -261,6 +265,27 @@
         let currentImage = null;
         let previewMode = false;
         const sampleValues = [12, 38, '92%', 7, 3, 156, '88%', 24, 1281, '90%', 15, 30];
+        let gaugeLabels = [];
+
+        // Auto-save to localStorage
+        function autoSave() {
+            const config = {
+                image: currentImage,
+                gaugeCount: maxGauges,
+                positions: positions,
+                labels: gaugeLabels,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('dashboard_config', JSON.stringify(config));
+        }
+
+        // Load from localStorage on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('dashboard_config');
+            if (saved) {
+                console.log('Auto-saved configuration found');
+            }
+        });
 
         function loadImage() {
             const imageSelect = document.getElementById('imageSelect');
@@ -321,6 +346,7 @@
                 y: yPercent,
                 index: positions.length + 1
             });
+            gaugeLabels.push(`Gauge ${positions.length}`);
 
             // Add visual marker
             const marker = document.createElement('div');
@@ -336,6 +362,7 @@
             container.appendChild(marker);
 
             updateOutput();
+            autoSave();
         }
 
         function updateOutput() {
@@ -346,9 +373,21 @@
 
             output.style.display = 'block';
 
+            // Update label inputs
+            const labelInputs = document.getElementById('labelInputs');
+            labelInputs.innerHTML = '<h3 style="color: #10B981; margin-bottom: 10px;">📝 Gauge Labels:</h3>' +
+                positions.map((p, i) => `
+                    <div style="margin-bottom: 10px;">
+                        <label style="display: inline-block; width: 80px;">Gauge ${p.index}:</label>
+                        <input type="text" id="label-${i}" value="${gaugeLabels[i] || 'Gauge ' + p.index}" 
+                               onchange="updateLabel(${i}, this.value)"
+                               style="width: 300px; padding: 5px; background: #1a1a1a; border: 1px solid #10B981; color: #fff; border-radius: 4px;">
+                    </div>
+                `).join('');
+
             // Update position list
-            positionList.innerHTML = positions.map(p => 
-                `<li>Gauge ${p.index}: X=${p.x}%, Y=${p.y}%</li>`
+            positionList.innerHTML = positions.map((p, i) => 
+                `<li>${gaugeLabels[i]}: X=${p.x}%, Y=${p.y}%</li>`
             ).join('');
 
             // Generate CSS
@@ -435,6 +474,93 @@
         function hidePreview(container) {
             const previews = container.querySelectorAll('[data-preview="true"]');
             previews.forEach(p => p.remove());
+        }
+
+        function updateLabel(index, value) {
+            gaugeLabels[index] = value;
+            autoSave();
+            updateOutput();
+        }
+
+        function saveConfig() {
+            if (positions.length === 0) {
+                alert('No positions to save! Click on gauge positions first.');
+                return;
+            }
+
+            const config = {
+                dashboardName: currentImage.replace('_clean.png', '').replace(/_/g, ' '),
+                image: currentImage,
+                gaugeCount: maxGauges,
+                positions: positions,
+                labels: gaugeLabels,
+                timestamp: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentImage.replace('.png', '')}_config.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('Configuration saved! File downloaded.');
+        }
+
+        function loadConfig(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const config = JSON.parse(e.target.result);
+                    
+                    // Set image and gauge count
+                    document.getElementById('imageSelect').value = config.image;
+                    document.getElementById('gaugeCount').value = config.gaugeCount;
+                    
+                    // Load image
+                    currentImage = config.image;
+                    maxGauges = config.gaugeCount;
+                    
+                    // Restore positions and labels
+                    positions = config.positions;
+                    gaugeLabels = config.labels;
+                    
+                    // Reload image with markers
+                    reset();
+                    loadImage();
+                    
+                    // Wait for image to load, then add markers
+                    setTimeout(() => {
+                        const container = document.getElementById('imageContainer');
+                        if (container) {
+                            const rect = container.getBoundingClientRect();
+                            positions.forEach((pos, index) => {
+                                const marker = document.createElement('div');
+                                marker.className = 'marker';
+                                marker.style.left = (rect.width * pos.x / 100) + 'px';
+                                marker.style.top = (rect.height * pos.y / 100) + 'px';
+                                
+                                const label = document.createElement('div');
+                                label.className = 'marker-label';
+                                label.textContent = `G${index + 1}`;
+                                marker.appendChild(label);
+                                
+                                container.appendChild(marker);
+                            });
+                            updateOutput();
+                        }
+                    }, 500);
+                    
+                    alert('Configuration loaded successfully!');
+                } catch (err) {
+                    alert('Error loading configuration: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
