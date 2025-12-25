@@ -302,6 +302,7 @@
                 gaugeCount: maxGauges,
                 positions: positions,
                 labels: gaugeLabels,
+                font: selectedFont,
                 timestamp: new Date().toISOString()
             };
             localStorage.setItem('dashboard_config', JSON.stringify(config));
@@ -512,6 +513,7 @@
 
         function updateFontPreview() {
             selectedFont = document.getElementById('fontSelect').value;
+            autoSave();
             if (previewMode) {
                 const container = document.getElementById('imageContainer');
                 hidePreview(container);
@@ -542,6 +544,7 @@
                 gaugeCount: maxGauges,
                 positions: positions,
                 labels: gaugeLabels,
+                font: selectedFont,
                 timestamp: new Date().toISOString()
             };
 
@@ -565,32 +568,33 @@
                 try {
                     const config = JSON.parse(e.target.result);
                     
-                    // Set image and gauge count
+                    // Restore positions and labels FIRST
+                    positions = config.positions || [];
+                    gaugeLabels = config.labels || [];
+                    selectedFont = config.font || "'Orbitron', sans-serif";
+                    
+                    // Set form values
                     document.getElementById('imageSelect').value = config.image;
                     document.getElementById('gaugeCount').value = config.gaugeCount;
+                    document.getElementById('fontSelect').value = selectedFont;
                     
-                    // Load image
+                    // Set current state
                     currentImage = config.image;
                     maxGauges = config.gaugeCount;
                     
-                    // Restore positions and labels
-                    positions = config.positions;
-                    gaugeLabels = config.labels;
-                    
-                    // Reload image with markers
-                    reset();
+                    // Load image fresh
                     loadImage();
                     
-                    // Wait for image to load, then add markers
+                    // Wait for image to load, then restore markers
                     setTimeout(() => {
                         const container = document.getElementById('imageContainer');
                         if (container) {
-                            const rect = container.getBoundingClientRect();
+                            // Add all markers
                             positions.forEach((pos, index) => {
                                 const marker = document.createElement('div');
                                 marker.className = 'marker';
-                                marker.style.left = (rect.width * pos.x / 100) + 'px';
-                                marker.style.top = (rect.height * pos.y / 100) + 'px';
+                                marker.style.left = pos.x + '%';
+                                marker.style.top = pos.y + '%';
                                 
                                 const label = document.createElement('div');
                                 label.className = 'marker-label';
@@ -601,7 +605,7 @@
                             });
                             updateOutput();
                         }
-                    }, 500);
+                    }, 800);
                     
                     alert('Configuration loaded successfully!');
                 } catch (err) {
